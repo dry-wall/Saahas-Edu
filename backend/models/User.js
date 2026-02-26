@@ -9,7 +9,7 @@ const UserSchema = new mongoose.Schema({
     accessibilityProfile: {
         disabilityType: {
             type: String,
-            enum: ['visual', 'hearing', 'motor', 'cognitive', 'none'],
+            enum: ['visual', 'hearing', 'motor', 'cognitive', 'speech', 'none'],
             default: 'none'
         },
         preferences: {

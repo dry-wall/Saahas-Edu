@@ -5,8 +5,14 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware - allows the server to understand JSON and handle CORS
-app.use(cors());
+// FIXED: Specify allowed origins instead of wildcard
+// This allows both Vite's default port and the common React port
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'x-auth-token'],
+}));
+
 app.use(express.json());
 
 // Routes
@@ -15,14 +21,13 @@ app.use('/api/courses', require('./routes/courseRoutes'));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("✅ MongoDB Connected..."))
-    .catch(err => console.log("❌ DB Connection Error:", err));
+  .then(() => console.log("✅ MongoDB Connected..."))
+  .catch(err => console.log("❌ DB Connection Error:", err));
 
-// A simple test route to see if it works
+// Health check route
 app.get('/', (req, res) => {
-    res.send("Automata API is running smoothly!");
+  res.send("Saahas API is running smoothly!");
 });
 
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => console.log(`🚀 Server started on port ${PORT}`));
