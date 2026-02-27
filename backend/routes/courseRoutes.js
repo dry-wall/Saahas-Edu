@@ -1,8 +1,9 @@
-const express = require('express');
+import express from 'express';
+import Course from '../models/Course.js';
+import User from '../models/User.js';
+import auth from '../middleware/auth.js';
+
 const router = express.Router();
-const Course = require('../models/Course');
-const User = require('../models/User');
-const auth = require('../middleware/auth'); // Security & Compliance 
 
 // @route   GET api/courses
 // @desc    Get all courses (Simplified list)
@@ -64,4 +65,4 @@ router.post('/', auth, async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

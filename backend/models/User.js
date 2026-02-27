@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const UserSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -21,8 +22,6 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
-const bcrypt = require('bcryptjs');
-
 // This logic runs every time a user is saved
 UserSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
@@ -31,4 +30,4 @@ UserSchema.pre('save', async function (next) {
     next();
 });
 
-module.exports = mongoose.model('User', UserSchema);
+export default mongoose.model('User', UserSchema);

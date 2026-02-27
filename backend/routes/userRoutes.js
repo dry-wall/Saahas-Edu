@@ -1,9 +1,10 @@
-const auth = require('../middleware/auth');
-const express = require('express');
+import express from 'express';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+import auth from '../middleware/auth.js';
+
 const router = express.Router();
-const bcrypt = require('bcryptjs'); // For hashing passwords
-const jwt = require('jsonwebtoken'); // For session management
-const User = require('../models/User');
 
 // @route   POST /api/users/register
 // @desc    Student Intake & Needs Assessment (Sign Up)
@@ -74,4 +75,4 @@ router.get('/me', auth, async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

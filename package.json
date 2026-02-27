@@ -2,10 +2,10 @@
   "name": "saahas",
   "version": "1.0.0",
   "scripts": {
-    "frontend": "cd frontend && npm run dev",
+    "frontend": "cd Frontend && npm run dev",
     "backend": "cd backend && node server.js",
     "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
-    "install:all": "cd frontend && npm install && cd ../backend && npm install"
+    "install:all": "cd Frontend && npm install && cd ../backend && npm install"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"
