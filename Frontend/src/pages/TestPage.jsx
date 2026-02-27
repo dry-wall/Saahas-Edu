@@ -1,19 +1,24 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useAccessibility } from '../context/AccessibilityContext';
 import { testsAPI } from '../services/api';
 import QuestionCard from '../components/QuestionCard';
 import Timer from '../components/Timer';
 import ProgressBar from '../components/ProgressBar';
 import BehaviorTracker from '../components/BehaviorTracker';
+import AccessibilityToolbar from '../components/AccessibilityToolbar';
+import FocusTileOverlay from '../components/FocusTileOverlay';
+import AdhdDetectionModal from '../components/AdhdDetectionModal';
+import { useAdhdMouseDetection } from '../hooks/useAdhdMouseDetection';
 
 export default function TestPage() {
   const { user } = useAuth();
+  const { setAdhdFocus } = useAccessibility();
   const navigate = useNavigate();
 
   const [stage, setStage] = useState('loading'); // loading | active | result | error
   const [sessionId, setSessionId] = useState(null);
-  const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [totalQuestions, setTotalQuestions] = useState(0);
@@ -21,6 +26,18 @@ export default function TestPage() {
   const [timeRemaining, setTimeRemaining] = useState(60);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+
+  // ADHD detection
+  const [showAdhdModal, setShowAdhdModal] = useState(false);
+  const [adhdDismissed, setAdhdDismissed] = useState(false);
+
+  const handleAdhdDetected = useCallback(() => {
+    if (!adhdDismissed && !showAdhdModal) {
+      setShowAdhdModal(true);
+    }
+  }, [adhdDismissed, showAdhdModal]);
+
+  useAdhdMouseDetection(handleAdhdDetected, stage === 'active' && !adhdDismissed);
 
   // Start test on mount
   useEffect(() => {
@@ -114,6 +131,9 @@ export default function TestPage() {
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: '12px' }}>⏳</div>
           <p style={{ color: '#7a5c4a', fontWeight: 600 }}>Preparing your test...</p>
+          <p style={{ color: '#b5a08a', fontSize: '0.85rem', marginTop: '8px' }}>
+            Loading AI models for gaze & behavior tracking...
+          </p>
         </div>
       </div>
     );
@@ -163,9 +183,36 @@ export default function TestPage() {
           }}>
             {result.score}%
           </div>
-          <p style={{ color: '#7a5c4a', marginBottom: '32px' }}>
+          <p style={{ color: '#7a5c4a', marginBottom: '16px' }}>
             You got {result.correct} out of {result.total} correct
           </p>
+
+          {/* Behavior summary */}
+          {result.behaviorSummary && (
+            <div style={{
+              background: '#fff8f0', borderRadius: '12px', padding: '16px',
+              marginBottom: '24px', textAlign: 'left',
+              border: '1px solid #f0ddd0',
+            }}>
+              <p style={{ fontWeight: 700, color: '#d9623f', marginBottom: '8px' }}>
+                🧠 Behavior Analysis
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.85rem', color: '#7a5c4a' }}>
+                {result.behaviorSummary.idleCount > 0 && (
+                  <span>😴 Idle moments: {result.behaviorSummary.idleCount}</span>
+                )}
+                {result.behaviorSummary.gazeAwayCount > 0 && (
+                  <span>👀 Gaze away: {result.behaviorSummary.gazeAwayCount}</span>
+                )}
+                {result.behaviorSummary.tabSwitchCount > 0 && (
+                  <span>🔀 Tab switches: {result.behaviorSummary.tabSwitchCount}</span>
+                )}
+                {result.behaviorSummary.timerAdjustments > 0 && (
+                  <span>⏱️ Time extensions: {result.behaviorSummary.timerAdjustments}</span>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Question review */}
           <div style={{ textAlign: 'left' }}>
@@ -273,7 +320,28 @@ export default function TestPage() {
         </div>
       </div>
 
-      {/* Behavior tracker (camera + AI monitoring) */}
+      {/* Accessibility toolbar (side panel with toggles) */}
+      <AccessibilityToolbar />
+
+      {/* ADHD Focus Mode overlay (blurs non-hovered elements) */}
+      <FocusTileOverlay />
+
+      {/* AI-powered ADHD Detection Modal */}
+      {showAdhdModal && (
+        <AdhdDetectionModal
+          onConfirm={() => {
+            setAdhdFocus(true);
+            setShowAdhdModal(false);
+            setAdhdDismissed(true);
+          }}
+          onDismiss={() => {
+            setShowAdhdModal(false);
+            setAdhdDismissed(true);
+          }}
+        />
+      )}
+
+      {/* Behavior tracker (camera + AI gaze monitoring) */}
       {sessionId && user && (
         <BehaviorTracker
           studentId={user.id || user._id}
