@@ -5,10 +5,14 @@ import ActivityFeed from './ActivityFeed';
 import Card from '../common/Card';
 import { coursesAPI } from '../../services/api';
 
+const TEST_CURATOR_URL = 'http://localhost:5174'; // test curator runs on different port
+
 export default function StudentDashboard({ user }) {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [testOnline, setTestOnline] = useState(false);
+  const [checkingTest, setCheckingTest] = useState(true);
 
   useEffect(() => {
     coursesAPI.getAll()
@@ -16,6 +20,35 @@ export default function StudentDashboard({ user }) {
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
+
+  // Check if test curator backend is online
+  useEffect(() => {
+    const checkTestServer = async () => {
+      try {
+        const res = await fetch('http://localhost:5001/api/health');
+        setTestOnline(res.ok);
+      } catch {
+        setTestOnline(false);
+      } finally {
+        setCheckingTest(false);
+      }
+    };
+    checkTestServer();
+    // Re-check every 30 seconds
+    const interval = setInterval(checkTestServer, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleGiveTest = () => {
+    if (!testOnline) return;
+    // Pass student info to test curator via URL params
+    const params = new URLSearchParams({
+      studentId: user?.id || user?._id || '',
+      name: user?.name || '',
+      email: user?.email || '',
+    });
+    window.open(`${TEST_CURATOR_URL}/?${params.toString()}`, '_blank');
+  };
 
   return (
     <div className="space-y-6">
@@ -31,6 +64,58 @@ export default function StudentDashboard({ user }) {
         <StatsWidget label="Quiz Score Avg" value="82%" icon="🎯" color="blue" />
         <StatsWidget label="Hours Learned" value="34" icon="⏱️" color="green" />
       </div>
+
+      {/* Give Test Banner */}
+      <Card>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <span style={{ fontSize: '2.5rem' }}>📝</span>
+            <div>
+              <h3 className="font-bold text-gray-800 text-lg">
+                Adaptive Test Curator
+              </h3>
+              <p className="text-gray-500 text-sm">
+                Take an AI-powered adaptive test that adjusts to your learning pace.
+              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: checkingTest ? '#f0a500' : testOnline ? '#5cb85c' : '#e74c3c',
+                  display: 'inline-block'
+                }} />
+                <span style={{
+                  fontSize: '0.75rem',
+                  color: checkingTest ? '#f0a500' : testOnline ? '#5cb85c' : '#e74c3c',
+                  fontWeight: '600'
+                }}>
+                  {checkingTest ? 'Checking...' : testOnline ? 'Test server online' : 'Test server offline'}
+                </span>
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={handleGiveTest}
+            disabled={!testOnline || checkingTest}
+            style={{
+              background: testOnline ? 'linear-gradient(135deg, #f4845f, #f9b49a)' : '#ddd',
+              color: testOnline ? 'white' : '#999',
+              border: 'none',
+              borderRadius: '12px',
+              padding: '14px 28px',
+              fontWeight: '700',
+              fontSize: '1rem',
+              cursor: testOnline ? 'pointer' : 'not-allowed',
+              whiteSpace: 'nowrap',
+              boxShadow: testOnline ? '0 4px 12px rgba(244,132,95,0.3)' : 'none',
+              transition: 'all 0.2s'
+            }}
+          >
+            {checkingTest ? '⏳ Checking...' : testOnline ? 'Give Test 🚀' : '🔴 Unavailable'}
+          </button>
+        </div>
+      </Card>
 
       {/* Accessibility Profile Card */}
       {user?.accessibilityProfile && (
@@ -108,7 +193,7 @@ export default function StudentDashboard({ user }) {
           </div>
         </Card>
 
-        {/* Recent Activity — still static for now */}
+        {/* Recent Activity */}
         <Card>
           <h3 className="font-semibold text-gray-700 mb-4">Recent Activity</h3>
           <ActivityFeed />
