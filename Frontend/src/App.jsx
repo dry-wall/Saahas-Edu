@@ -9,6 +9,7 @@ import StudentDashboardPage from "./pages/StudentDashboardPage";
 import MentalHealthPage from "./pages/MentalHealthPage";
 import { AuthGuard } from "./components/auth/AuthGuard";
 import LandingPage from "./pages/LandingPage";
+import TestPage from "./pages/TestPage";
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="/sign-language" element={<AuthGuard><SignLanguagePage /></AuthGuard>} />
             <Route path="/dashboard" element={<AuthGuard><StudentDashboardPage /></AuthGuard>} />
             <Route path="/mental-health" element={<AuthGuard><MentalHealthPage /></AuthGuard>} />
+            <Route path="/start-test" element={<AuthGuard><TestPage /></AuthGuard>} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </BrowserRouter>

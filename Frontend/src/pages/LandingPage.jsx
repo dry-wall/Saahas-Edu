@@ -190,10 +190,11 @@ function ThreeHero() {
 
     // ── Animate ──
     let frame;
-    const clock = new THREE.Clock();
+    const timer = new THREE.Timer();
     const animate = () => {
       frame = requestAnimationFrame(animate);
-      const t = clock.getElapsedTime();
+      timer.update();
+      const t = timer.getElapsed();
 
       // kids float & sway
       kids.forEach((k, i) => {

@@ -9,15 +9,15 @@ import behaviorRoutes from "./routes/behavior.js";
 import testRoutes from "./routes/tests.js";
 import userRoutes from "./routes/userRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
+import studentRoutes from "./routes/students.js";
 
 dotenv.config();
 
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'x-auth-token'],
+  origin: true,
+  credentials: true
 }));
 
 app.use(express.json());
@@ -27,7 +27,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
 app.use("/api/behavior", behaviorRoutes);
 app.use("/api/tests", testRoutes);
-
+app.use("/api/students", studentRoutes);
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected..."))

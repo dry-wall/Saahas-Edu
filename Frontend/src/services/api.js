@@ -51,3 +51,34 @@ export const coursesAPI = {
       body: JSON.stringify(courseData),
     }),
 };
+
+export const testsAPI = {
+  start: (studentId) =>
+    request('/tests/start', {
+      method: 'POST',
+      body: JSON.stringify({ studentId }),
+    }),
+
+  nextQuestion: (sessionId, currentIndex) =>
+    request(`/tests/next/${sessionId}?currentIndex=${currentIndex}`),
+
+  answer: (data) =>
+    request('/tests/answer', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  submit: (sessionId) =>
+    request('/tests/submit', {
+      method: 'POST',
+      body: JSON.stringify({ sessionId }),
+    }),
+};
+
+export const behaviorAPI = {
+  log: (data) =>
+    request('/behavior/log', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+};

@@ -4,11 +4,12 @@ import ProgressCard from './ProgressCard';
 import ActivityFeed from './ActivityFeed';
 import Card from '../common/Card';
 import { coursesAPI } from '../../services/api';
-
+import { useNavigate } from 'react-router-dom';
 export default function StudentDashboard({ user }) {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     coursesAPI.getAll()
@@ -31,7 +32,38 @@ export default function StudentDashboard({ user }) {
         <StatsWidget label="Quiz Score Avg" value="82%" icon="🎯" color="blue" />
         <StatsWidget label="Hours Learned" value="34" icon="⏱️" color="green" />
       </div>
-
+      {/* Give Test Banner */}
+<Card>
+  <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+    <div className="flex items-center gap-4">
+      <span style={{ fontSize: '2.5rem' }}>📝</span>
+      <div>
+        <h3 className="font-bold text-gray-800 text-lg">Adaptive Test Curator</h3>
+        <p className="text-gray-500 text-sm">
+          AI-powered adaptive test that adjusts to your learning pace and focus.
+        </p>
+      </div>
+    </div>
+    <button
+      onClick={() => navigate('/start-test')}
+      style={{
+        background: 'linear-gradient(135deg, #f4845f, #f9b49a)',
+        color: 'white',
+        border: 'none',
+        borderRadius: '12px',
+        padding: '14px 28px',
+        fontWeight: '700',
+        fontSize: '1rem',
+        cursor: 'pointer',
+        whiteSpace: 'nowrap',
+        boxShadow: '0 4px 12px rgba(244,132,95,0.3)',
+        transition: 'all 0.2s'
+      }}
+    >
+      Give Test 🚀
+    </button>
+  </div>
+</Card>
       {/* Accessibility Profile Card */}
       {user?.accessibilityProfile && (
         <Card>
