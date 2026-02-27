@@ -23,6 +23,7 @@ export default function App() {
             <Route path="/sign-language" element={<AuthGuard><SignLanguagePage /></AuthGuard>} />
             <Route path="/dashboard" element={<AuthGuard><StudentDashboardPage /></AuthGuard>} />
             <Route path="/mental-health" element={<AuthGuard><MentalHealthPage /></AuthGuard>} />
+
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </BrowserRouter>

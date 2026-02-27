@@ -2,10 +2,11 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
 const navLinks = [
-  { path: '/braille', label: 'Braille', icon: '⠿' },
-  { path: '/sign-language', label: 'Sign Language', icon: '🤟' },
-  { path: '/dashboard', label: 'Student Dashboard', icon: '📊' },
-  { path: '/mental-health', label: 'Mental Health', icon: '🧠' },
+  { path: '/braille',       label: 'Braille',           icon: '⠿' },
+  { path: '/sign-language', label: 'Sign Language',      icon: '🤟' },
+  { path: '/dashboard',     label: 'Student Dashboard',  icon: '📊' },
+  { path: '/mental-health', label: 'Mental Health',      icon: '🧠' },
+  { path: '/test-curator',  label: 'Test Curator',        icon: '📝' }, 
 ]
 
 export default function Navbar() {
